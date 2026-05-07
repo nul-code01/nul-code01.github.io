@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nul | 業務用エアコン簡易選定 V1</title>
+  <style>
+    :root {
+      --bg: #070b12;
+      --panel: #0d1420;
+      --panel-2: #101a29;
+      --line: rgba(120, 180, 255, 0.18);
+      --text: #eaf2ff;
+      --muted: #8ea3c7;
+      --accent: #63a8ff;
+      --accent-2: #8bd3ff;
+      --danger: #ff7474;
+      --shadow: 0 0 24px rgba(99, 168, 255, 0.16);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(99,168,255,0.10), transparent 32%),
+        linear-gradient(180deg, #060912 0%, #08111c 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(14, 21, 33, 0.96), rgba(8, 15, 26, 0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(99,168,255,0.08), rgba(99,168,255,0.02));
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+      margin-bottom: 10px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(99, 168, 255, 0.9);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.22;
+      letter-spacing: 0.02em;
+    }
+
+    .sub {
+      margin: 10px 0 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .section {
+      padding: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(120, 180, 255, 0.2);
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: rgba(99, 168, 255, 0.65);
+      box-shadow: 0 0 0 4px rgba(99, 168, 255, 0.12), 0 0 18px rgba(99, 168, 255, 0.12);
+      background: rgba(255,255,255,0.05);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    button:active { transform: scale(0.985); }
+
+    .primary {
+      color: #041120;
+      background: linear-gradient(135deg, var(--accent-2), var(--accent));
+      box-shadow: 0 0 24px rgba(99, 168, 255, 0.25);
+    }
+
+    .secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .results {
+      padding: 0 18px 18px;
+    }
+
+    .result-panel {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(14,22,36,0.94), rgba(9,16,26,0.94));
+      overflow: hidden;
+    }
+
+    .result-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .result-head strong {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      color: var(--accent-2);
+    }
+
+    .badge {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .hero-result {
+      padding: 22px 18px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .size-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .size-value {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      color: var(--accent-2);
+      text-shadow: 0 0 18px rgba(99,168,255,0.22);
+    }
+
+    .size-note {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .metric {
+      border: 1px solid rgba(120,180,255,0.14);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .metric .k {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .metric .v {
+      font-size: 22px;
+      font-weight: 750;
+      line-height: 1.2;
+    }
+
+    .foot {
+      padding: 14px 18px 0;
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .error {
+      margin-top: 12px;
+      color: var(--danger);
+      font-size: 13px;
+      display: none;
+    }
+
+    .copyright {
+      text-align: center;
+      color: #6f84a6;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      padding: 18px 0 8px;
+    }
+
+    @media (max-width: 480px) {
+      .grid, .metrics, .actions {
+        grid-template-columns: 1fr;
+      }
+      h1 { font-size: 23px; }
+      .size-value { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="hero">
+        <div class="brand"><span class="dot"></span>Nul / Aircon Selector V1</div>
+        <h1>業務用エアコン<br>簡易選定ツール</h1>
+        <p class="sub">
+          V1はシンプル重視。縦・横・高さ・用途から、業務用エアコンのざっくりした冷房能力とサイズ目安を即表示します。
+        </p>
+      </div>
+
+      <div class="section">
+        <div class="grid">
+          <div class="field">
+            <label for="length">縦（m）</label>
+            <input id="length" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 8" />
+          </div>
+          <div class="field">
+            <label for="width">横（m）</label>
+            <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 6" />
+          </div>
+          <div class="field">
+            <label for="height">高さ（m）</label>
+            <input id="height" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 2.7" />
+          </div>
+          <div class="field">
+            <label for="usage">用途</label>
+            <select id="usage">
+              <option value="office">事務所</option>
+              <option value="shop">店舗</option>
+              <option value="restaurant">飲食店</option>
+              <option value="kitchen">厨房</option>
+              <option value="warehouse">倉庫</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="calcBtn">選定する</button>
+          <button class="secondary" id="resetBtn">リセット</button>
+        </div>
+        <div class="error" id="errorMsg">すべての数値を正しく入力してください</div>
+      </div>
+
+      <div class="results">
+        <div class="result-panel">
+          <div class="result-head">
+            <strong>RESULT</strong>
+            <span class="badge" id="usageBadge">事務所 / 標準係数</span>
+          </div>
+
+          <div class="hero-result">
+            <div class="size-label">推奨サイズ目安</div>
+            <div class="size-value" id="sizeValue">---</div>
+            <div class="size-note" id="sizeNote">数値を入れて選定すると表示されます</div>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="k">室内容積</div>
+              <div class="v" id="volumeValue">0 m³</div>
+            </div>
+            <div class="metric">
+              <div class="k">必要冷房能力</div>
+              <div class="v" id="requiredKwValue">0.0 kW</div>
+            </div>
+            <div class="metric">
+              <div class="k">推奨エアコン能力</div>
+              <div class="v" id="recommendKwValue">0.0 kW</div>
+            </div>
+            <div class="metric">
+              <div class="k">馬力（目安）</div>
+              <div class="v" id="hpValue">0.0 HP</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot">
+          ・V1は簡易選定です。用途別の代表係数と安全マージンで算出しています<br>
+          ・方角、人数、発熱機器などの補正はV2想定です<br>
+          ・最終選定はメーカー資料、現地条件、外気負荷、換気量、内部発熱を必ず確認してください
+        </div>
+      </div>
+    </div>
+
+    <div class="copyright">Nul / Built from silence, shaped by function</div>
+  </div>
+
+  <script>
+    const COEFFICIENTS = {
+      office: { label: '事務所', factor: 0.06 },
+      shop: { label: '店舗', factor: 0.085 },
+      restaurant: { label: '飲食店', factor: 0.125 },
+      kitchen: { label: '厨房', factor: 0.20 },
+      warehouse: { label: '倉庫', factor: 0.04 }
+    };
+
+    const SIZE_TABLE = [
+      { size: '80形', kw: 2.2 },
+      { size: '100形', kw: 2.8 },
+      { size: '140形', kw: 4.0 },
+      { size: '160形', kw: 5.6 },
+      { size: '224形', kw: 7.1 },
+      { size: '280形', kw: 10.0 },
+      { size: '355形', kw: 12.5 },
+      { size: '450形', kw: 16.0 }
+    ];
+
+    const SAFETY_MARGIN = 1.15;
+    const HP_PER_KW = 1 / 2.8;
+
+    const $ = (id) => document.getElementById(id);
+
+    function round1(num) {
+      return Math.round(num * 10) / 10;
+    }
+
+    function pickSize(targetKw) {
+      const matched = SIZE_TABLE.find(item => targetKw <= item.kw);
+      if (matched) return matched;
+      return SIZE_TABLE[SIZE_TABLE.length - 1];
+    }
+
+    function calculate() {
+      const length = parseFloat($('length').value);
+      const width = parseFloat($('width').value);
+      const height = parseFloat($('height').value);
+      const usage = $('usage').value;
+      const errorMsg = $('errorMsg');
+
+      if (!length || !width || !height || length <= 0 || width <= 0 || height <= 0) {
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+
+      const usageData = COEFFICIENTS[usage];
+      const volume = length * width * height;
+      const requiredKw = volume * usageData.factor;
+      const recommendKw = requiredKw * SAFETY_MARGIN;
+      const hp = recommendKw * HP_PER_KW;
+      const size = pickSize(recommendKw);
+
+      $('usageBadge').textContent = `${usageData.label} / 係数 ${usageData.factor.toFixed(3)}`;
+      $('volumeValue').textContent = `${round1(volume)} m³`;
+      $('requiredKwValue').textContent = `${round1(requiredKw)} kW`;
+      $('recommendKwValue').textContent = `${round1(recommendKw)} kW`;
+      $('hpValue').textContent = `${round1(hp)} HP`;
+      $('sizeValue').textContent = size.size;
+      $('sizeNote').textContent = `${round1(recommendKw)}kWベースでの簡易推奨クラス`;
+    }
+
+    function resetFields() {
+      $('length').value = '';
+      $('width').value = '';
+      $('height').value = '';
+      $('usage').value = 'office';
+      $('usageBadge').textContent = '事務所 / 標準係数';
+      $('volumeValue').textContent = '0 m³';
+      $('requiredKwValue').textContent = '0.0 kW';
+      $('recommendKwValue').textContent = '0.0 kW';
+      $('hpValue').textContent = '0.0 HP';
+      $('sizeValue').textContent = '---';
+      $('sizeNote').textContent = '数値を入れて選定すると表示されます';
+      $('errorMsg').style.display = 'none';
+    }
+
+    $('calcBtn').addEventListener('click', calculate);
+    $('resetBtn').addEventListener('click', resetFields);
+
+    ['length','width','height'].forEach(id => {
+      $(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') calculate();
+      });
+    });
+  </script>
+</body>
+</html>
