@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Nul Lighting Calculator</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:20px;
+  background:#0b0b0b;
+  color:#ffffff;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+}
+
+.container{
+  max-width:500px;
+  margin:0 auto;
+}
+
+.title{
+  font-size:28px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.sub{
+  color:#999;
+  margin-bottom:24px;
+  font-size:14px;
+}
+
+.card{
+  background:#161616;
+  border:1px solid #2a2a2a;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+.label{
+  display:block;
+  margin-bottom:8px;
+  font-size:14px;
+  color:#ccc;
+}
+
+input,
+select{
+  width:100%;
+  background:#0f0f0f;
+  border:1px solid #333;
+  color:#fff;
+  border-radius:12px;
+  padding:14px;
+  font-size:16px;
+  margin-bottom:14px;
+}
+
+button{
+  width:100%;
+  border:none;
+  border-radius:14px;
+  padding:16px;
+  font-size:16px;
+  font-weight:700;
+  background:#ffffff;
+  color:#000;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+.result-item{
+  padding:14px 0;
+  border-bottom:1px solid #2b2b2b;
+}
+
+.result-item:last-child{
+  border-bottom:none;
+}
+
+.result-label{
+  color:#999;
+  font-size:13px;
+  margin-bottom:6px;
+}
+
+.result-value{
+  font-size:24px;
+  font-weight:700;
+}
+
+.note{
+  margin-top:18px;
+  color:#777;
+  font-size:12px;
+  line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="title">
+    Nul Lighting Calculator
+  </div>
+
+  <div class="sub">
+    照度・必要光束・照明器具数を簡易算出
+  </div>
+
+  <div class="card">
+
+    <label class="label">縦（m）</label>
+    <input type="number" id="width" placeholder="例：5">
+
+    <label class="label">横（m）</label>
+    <input type="number" id="depth" placeholder="例：4">
+
+    <label class="label">高さ（m）</label>
+    <input type="number" id="height" placeholder="例：2.5">
+
+    <label class="label">用途</label>
+    <select id="usage">
+      <option value="office">事務所</option>
+      <option value="meeting">会議室</option>
+      <option value="shop">店舗</option>
+      <option value="restaurant">飲食店</option>
+      <option value="toilet">トイレ</option>
+      <option value="warehouse">倉庫</option>
+    </select>
+
+    <label class="label">器具1台の明るさ（lm）</label>
+    <input type="number" id="fixtureLm" placeholder="例：2000">
+
+    <button onclick="calculateLighting()">
+      計算する
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <div class="result-item">
+      <div class="result-label">面積</div>
+      <div class="result-value" id="resultArea">-</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">目標照度</div>
+      <div class="result-value" id="resultIlluminance">-</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">必要総光束</div>
+      <div class="result-value" id="resultLumens">-</div>
+    </div>
+
+    <div class="result-item">
+      <div class="result-label">推奨器具数</div>
+      <div class="result-value" id="resultFixtures">-</div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+const illuminanceMap = {
+  office: 750,
+  meeting: 500,
+  shop: 700,
+  restaurant: 300,
+  toilet: 200,
+  warehouse: 100
+};
+
+function calculateLighting(){
+
+  const width =
+    parseFloat(document.getElementById("width").value);
+
+  const depth =
+    parseFloat(document.getElementById("depth").value);
+
+  const height =
+    parseFloat(document.getElementById("height").value);
+
+  const usage =
+    document.getElementById("usage").value;
+
+  const fixtureLm =
+    parseFloat(document.getElementById("fixtureLm").value);
+
+  // 面積
+  const area = width * depth;
+
+  // 用途別照度
+  const illuminance =
+    illuminanceMap[usage];
+
+  // 固定値
+  const utilizationFactor = 0.6;
+  const maintenanceFactor = 0.8;
+
+  // 必要総光束
+  const totalLumens =
+    (illuminance * area) /
+    (utilizationFactor * maintenanceFactor);
+
+  // 器具数
+  let fixtureCount = "-";
+
+  if(fixtureLm && fixtureLm > 0){
+    fixtureCount =
+      Math.ceil(totalLumens / fixtureLm) + " 台";
+  }
+
+  // 表示
+  document.getElementById("resultArea").innerText =
+    area.toFixed(1) + " ㎡";
+
+  document.getElementById("resultIlluminance").innerText =
+    illuminance + " lx";
+
+  document.getElementById("resultLumens").innerText =
+    Math.round(totalLumens).toLocaleString() + " lm";
+
+  document.getElementById("resultFixtures").innerText =
+    fixtureCount;
+
+}
+
+</script>
+
+</body>
+</html>
