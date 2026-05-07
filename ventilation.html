@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nul Ventilation Tool v1.0</title>
+  <style>
+    :root {
+      --bg: #07090d;
+      --panel: #0f141c;
+      --panel-2: #121a25;
+      --line: rgba(91, 163, 255, 0.18);
+      --line-strong: rgba(91, 163, 255, 0.4);
+      --text: #eef4ff;
+      --muted: #9aa8be;
+      --accent: #69a8ff;
+      --accent-soft: rgba(105, 168, 255, 0.16);
+      --good: #b7d3ff;
+      --shadow: 0 0 0 1px rgba(105, 168, 255, 0.12), 0 0 18px rgba(38, 110, 210, 0.14);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background:
+        radial-gradient(circle at top, rgba(70, 120, 255, 0.12), transparent 28%),
+        linear-gradient(180deg, #05070b 0%, #07090d 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      min-height: 100%;
+    }
+
+    body {
+      padding: 20px 14px 40px;
+    }
+
+    .wrap {
+      width: min(100%, 560px);
+      margin: 0 auto;
+    }
+
+    .hero, .card, .result-card, .note-card {
+      background: linear-gradient(180deg, rgba(17, 24, 35, 0.96), rgba(10, 14, 21, 0.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+    }
+
+    .hero {
+      padding: 18px 18px 16px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.15;
+      margin: 0 0 8px;
+      font-weight: 800;
+    }
+
+    .sub {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    .card {
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--good);
+      margin: 0 0 12px;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--good);
+      margin-bottom: 7px;
+      font-weight: 600;
+    }
+
+    input[type="number"], select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #0d1219, #0a0e14);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 16px;
+      outline: none;
+      transition: 0.18s ease;
+      appearance: none;
+    }
+
+    input[type="number"]:focus, select:focus {
+      border-color: var(--line-strong);
+      box-shadow: 0 0 0 3px rgba(105, 168, 255, 0.12), 0 0 18px rgba(105, 168, 255, 0.15);
+    }
+
+    .helper {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .check-wrap {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17, 24, 35, 0.95), rgba(10, 14, 21, 0.95));
+    }
+
+    .check input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      margin: 0;
+      flex: 0 0 auto;
+    }
+
+    .check .text {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      width: 100%;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .check .plus {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .actions {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 16px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:active { transform: scale(0.99); }
+
+    .primary {
+      background: linear-gradient(180deg, #78b2ff, #4d86e7);
+      color: #04111f;
+      box-shadow: 0 8px 24px rgba(83, 138, 255, 0.28);
+    }
+
+    .secondary {
+      background: linear-gradient(180deg, #18212e, #121925);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .result-card {
+      padding: 16px;
+      margin-top: 14px;
+    }
+
+    .result-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .result-item {
+      padding: 14px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(19, 29, 45, 0.95), rgba(10, 15, 24, 0.95));
+      border: 1px solid rgba(105, 168, 255, 0.18);
+    }
+
+    .result-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .result-value {
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 800;
+      color: #eff6ff;
+      text-shadow: 0 0 18px rgba(105, 168, 255, 0.22);
+      word-break: break-word;
+    }
+
+    .result-unit {
+      font-size: 15px;
+      color: var(--good);
+      margin-left: 4px;
+      font-weight: 700;
+    }
+
+    .mini {
+      margin-top: 8px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .note-card {
+      margin-top: 14px;
+      padding: 14px 16px;
+    }
+
+    .note-card ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7b8ca8;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 460px) {
+      .grid, .actions {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .result-value {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Nul Tool / Ventilation</div>
+      <h1>換気計算ツール v1.0</h1>
+      <p class="sub">
+        室内容積と換気回数から必要換気量を算出し、現場補正を加えた目安風量まで表示します
+      </p>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Input</h2>
+
+      <div class="grid">
+        <div class="field">
+          <label for="length">部屋の縦</label>
+          <input id="length" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 5.0" />
+          <div class="helper">単位 m</div>
+        </div>
+
+        <div class="field">
+          <label for="width">部屋の横</label>
+          <input id="width" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 4.0" />
+          <div class="helper">単位 m</div>
+        </div>
+
+        <div class="field full">
+          <label for="height">部屋の高さ</label>
+          <input id="height" type="number" inputmode="decimal" min="0" step="0.1" placeholder="例 2.5" />
+          <div class="helper">単位 m</div>
+        </div>
+
+        <div class="field full">
+          <label for="usage">用途</label>
+          <select id="usage">
+            <option value="office">事務所</option>
+            <option value="shop">店舗</option>
+            <option value="restaurant">飲食店</option>
+            <option value="toilet">トイレ</option>
+            <option value="warehouse">倉庫</option>
+            <option value="other">その他</option>
+          </select>
+          <div class="helper" id="usageGuide">初期換気回数の目安 6 回/h</div>
+        </div>
+
+        <div class="field full">
+          <label for="airChangeRate">カスタム換気回数</label>
+          <input id="airChangeRate" type="number" inputmode="decimal" min="0" step="0.1" placeholder="自動入力されます" />
+          <div class="helper">用途選択で自動入力されます。必要に応じて上書き可能</div>
+        </div>
+
+        <div class="field full">
+          <label>現場補正</label>
+
+          <div class="check-wrap">
+            <label class="check">
+              <input id="duct" type="checkbox" />
+              <span class="text">
+                <span>ダクトあり</span>
+                <span class="plus">+20%</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input id="bend" type="checkbox" />
+              <span class="text">
+                <span>曲がり多い</span>
+                <span class="plus">+10%</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input id="filter" type="checkbox" />
+              <span class="text">
+                <span>フィルターあり</span>
+                <span class="plus">+15%</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="calcBtn">計算する</button>
+        <button class="secondary" id="resetBtn" type="button">リセット</button>
+      </div>
+    </section>
+
+    <section class="result-card">
+      <h2 class="section-title">Result</h2>
+
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-label">室内容積</div>
+          <div class="result-value">
+            <span id="volumeValue">-</span><span class="result-unit">m³</span>
+          </div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">基本換気量</div>
+          <div class="result-value">
+            <span id="baseAirflowValue">-</span><span class="result-unit">m³/h</span>
+          </div>
+          <div class="mini">室内容積 × 換気回数</div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label">補正後必要風量</div>
+          <div class="result-value">
+            <span id="finalAirflowValue">-</span><span class="result-unit">m³/h</span>
+          </div>
+          <div class="mini" id="correctionSummary">補正係数 1.00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="note-card">
+      <h2 class="section-title">Note</h2>
+      <ul>
+        <li>本ツールは簡易計算です</li>
+        <li>ダクト・曲がり・フィルター等の抵抗を考慮した目安値です</li>
+        <li>最終選定は静圧条件・機器性能曲線・法令条件をご確認ください</li>
+      </ul>
+    </section>
+
+    <div class="footer">Nul Ventilation Tool v1.0</div>
+  </div>
+
+  <script>
+    const usageDefaults = {
+      office: {
+        rate: 6,
+        guide: '目安 5〜10 回/h / 初期値 6 回/h'
+      },
+      shop: {
+        rate: 8,
+        guide: '目安 6〜15 回/h / 初期値 8 回/h'
+      },
+      restaurant: {
+        rate: 12,
+        guide: '目安 10〜20 回/h / 初期値 12 回/h'
+      },
+      toilet: {
+        rate: 12,
+        guide: '目安 10〜15 回/h / 初期値 12 回/h'
+      },
+      warehouse: {
+        rate: 4,
+        guide: '目安 3〜6 回/h / 初期値 4 回/h'
+      },
+      other: {
+        rate: 6,
+        guide: '初期値 6 回/h'
+      }
+    };
+
+    const els = {
+      length: document.getElementById('length'),
+      width: document.getElementById('width'),
+      height: document.getElementById('height'),
+      usage: document.getElementById('usage'),
+      usageGuide: document.getElementById('usageGuide'),
+      airChangeRate: document.getElementById('airChangeRate'),
+      duct: document.getElementById('duct'),
+      bend: document.getElementById('bend'),
+      filter: document.getElementById('filter'),
+      calcBtn: document.getElementById('calcBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      volumeValue: document.getElementById('volumeValue'),
+      baseAirflowValue: document.getElementById('baseAirflowValue'),
+      finalAirflowValue: document.getElementById('finalAirflowValue'),
+      correctionSummary: document.getElementById('correctionSummary')
+    };
+
+    function formatNumber(value) {
+      if (!Number.isFinite(value)) return '-';
+
+      const rounded = Math.round(value * 10) / 10;
+
+      return rounded.toLocaleString('ja-JP', {
+        minimumFractionDigits: rounded % 1 === 0 ? 0 : 1,
+        maximumFractionDigits: 1
+      });
+    }
+
+    function setDefaultAirChangeRate() {
+      const config = usageDefaults[els.usage.value];
+
+      els.airChangeRate.value = config.rate;
+      els.usageGuide.textContent = config.guide;
+    }
+
+    function calculate() {
+      const length = parseFloat(els.length.value);
+      const width = parseFloat(els.width.value);
+      const height = parseFloat(els.height.value);
+      const airChangeRate = parseFloat(els.airChangeRate.value);
+
+      if (![length, width, height, airChangeRate].every(v => Number.isFinite(v) && v > 0)) {
+        alert('縦・横・高さ・換気回数に正の数値を入力してください');
+        return;
+      }
+
+      // 室内容積 = 縦 × 横 × 高さ
+      const volume = length * width * height;
+
+      // 基本換気量 = 室内容積 × 換気回数
+      const baseAirflow = volume * airChangeRate;
+
+      // 現場補正
+      let correction = 1.0;
+      const applied = [];
+
+      if (els.duct.checked) {
+        correction *= 1.2;
+        applied.push('ダクト +20%');
+      }
+
+      if (els.bend.checked) {
+        correction *= 1.1;
+        applied.push('曲がり +10%');
+      }
+
+      if (els.filter.checked) {
+        correction *= 1.15;
+        applied.push('フィルター +15%');
+      }
+
+      // 補正後必要風量 = 基本換気量 × 補正係数
+      const finalAirflow = baseAirflow * correction;
+
+      els.volumeValue.textContent = formatNumber(volume);
+      els.baseAirflowValue.textContent = formatNumber(baseAirflow);
+      els.finalAirflowValue.textContent = formatNumber(finalAirflow);
+
+      els.correctionSummary.textContent =
+        `補正係数 ${correction.toFixed(2)}${applied.length ? ' / ' + applied.join(' ・ ') : ' / 補正なし'}`;
+    }
+
+    function resetForm() {
+      els.length.value = '';
+      els.width.value = '';
+      els.height.value = '';
+      els.usage.value = 'office';
+
+      els.duct.checked = false;
+      els.bend.checked = false;
+      els.filter.checked = false;
+
+      setDefaultAirChangeRate();
+
+      els.volumeValue.textContent = '-';
+      els.baseAirflowValue.textContent = '-';
+      els.finalAirflowValue.textContent = '-';
+      els.correctionSummary.textContent = '補正係数 1.00';
+    }
+
+    els.usage.addEventListener('change', setDefaultAirChangeRate);
+    els.calcBtn.addEventListener('click', calculate);
+    els.resetBtn.addEventListener('click', resetForm);
+
+    setDefaultAirChangeRate();
+  </script>
+</body>
+</html>
