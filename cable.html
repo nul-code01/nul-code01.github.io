@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nul Cable Calculator</title>
+
+  <style>
+    :root {
+      --bg: #05070b;
+      --card: #0b111c;
+      --card2: #08101a;
+      --line: rgba(0, 180, 255, 0.45);
+      --blue: #00b7ff;
+      --blue2: #7fe6ff;
+      --text: #f4fbff;
+      --muted: #7f94a3;
+      --danger: #ff5b6e;
+      --warn: #ffd166;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(0, 183, 255, 0.18), transparent 35%),
+        linear-gradient(180deg, #02030a 0%, #05070b 100%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      padding: 18px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    .title {
+      margin-bottom: 18px;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      font-weight: 700;
+    }
+
+    .title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(15, 27, 43, 0.92), rgba(6, 12, 22, 0.96));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow:
+        0 0 22px rgba(0, 183, 255, 0.12),
+        inset 0 0 18px rgba(0, 183, 255, 0.04);
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 7px;
+      letter-spacing: 0.04em;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(0, 183, 255, 0.45);
+      background: #050b13;
+      color: var(--text);
+      border-radius: 13px;
+      padding: 14px 13px;
+      font-size: 18px;
+      outline: none;
+      box-shadow: inset 0 0 14px rgba(0, 183, 255, 0.06);
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow:
+        0 0 0 3px rgba(0, 183, 255, 0.14),
+        0 0 20px rgba(0, 183, 255, 0.16);
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .segmented button {
+      border: 1px solid rgba(0, 183, 255, 0.35);
+      background: #060d16;
+      color: var(--muted);
+      border-radius: 13px;
+      padding: 13px 0;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .segmented button.active {
+      color: var(--text);
+      border-color: var(--blue);
+      background: rgba(0, 183, 255, 0.14);
+      box-shadow: 0 0 18px rgba(0, 183, 255, 0.18);
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .result-main {
+      text-align: center;
+      padding: 8px 0 2px;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .result-size {
+      font-size: 54px;
+      line-height: 1;
+      font-weight: 800;
+      color: var(--blue2);
+      text-shadow:
+        0 0 18px rgba(0, 183, 255, 0.45),
+        0 0 36px rgba(0, 183, 255, 0.2);
+      letter-spacing: -0.04em;
+    }
+
+    .result-size span {
+      font-size: 26px;
+      margin-left: 4px;
+      letter-spacing: 0;
+    }
+
+    .min-size {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .detail {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 13px;
+      padding: 11px;
+    }
+
+    .detail .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .detail .v {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+      padding: 0 4px 20px;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      padding: 18px 0;
+    }
+
+    .usage-ok {
+      color: var(--blue2);
+    }
+
+    .usage-warn {
+      color: var(--warn);
+    }
+
+    .usage-danger {
+      color: var(--danger);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <div class="title">
+      <h1>Nul Cable Calculator</h1>
+      <p>A / kW → 推奨sq・最小成立sq・許容電流</p>
+    </div>
+
+    <section class="card">
+      <label>INPUT TYPE</label>
+      <div class="segmented">
+        <button id="modeA" class="active" type="button">A</button>
+        <button id="modeKW" type="button">kW</button>
+      </div>
+
+      <div class="field">
+        <label id="valueLabel">電流（A）</label>
+        <input id="inputValue" type="number" inputmode="decimal" placeholder="例：18.7" />
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="field">
+        <label>Voltage</label>
+        <select id="voltage">
+          <option value="200">三相200V</option>
+          <option value="100">単相100V</option>
+          <option value="200single">単相200V</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Cable</label>
+        <select id="cable">
+          <option value="CV">CV</option>
+        </select>
+      </div>
+
+      <div class="field" style="margin-bottom: 0;">
+        <label>Cores</label>
+        <select id="cores">
+          <option value="3C">3C</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card">
+      <div id="resultArea" class="empty">
+        数値を入力してください
+      </div>
+    </section>
+
+    <div class="note">
+      ※ 許容電流は一般的な布設条件（ラック・ころがし）基準の簡易計算です<br>
+      ※ 推奨サイズは「最小成立サイズの1ランク上」として表示しています<br>
+      ※ 力率は kW換算時のみ PF=0.85 で計算しています
+    </div>
+  </main>
+
+  <script>
+    const PF = 0.85;
+
+    const allowableCurrent = {
+      CV: {
+        "3C": {
+          "1.6": 18,
+          "2": 24,
+          "3.5": 32,
+          "5.5": 43,
+          "8": 58,
+          "14": 76,
+          "22": 101,
+          "38": 131,
+          "60": 176,
+          "100": 245
+        }
+      }
+    };
+
+    let mode = "A";
+
+    const modeA = document.getElementById("modeA");
+    const modeKW = document.getElementById("modeKW");
+    const inputValue = document.getElementById("inputValue");
+    const valueLabel = document.getElementById("valueLabel");
+    const voltage = document.getElementById("voltage");
+    const cable = document.getElementById("cable");
+    const cores = document.getElementById("cores");
+    const resultArea = document.getElementById("resultArea");
+
+    modeA.addEventListener("click", () => setMode("A"));
+    modeKW.addEventListener("click", () => setMode("kW"));
+
+    inputValue.addEventListener("input", calculate);
+    voltage.addEventListener("change", calculate);
+    cable.addEventListener("change", calculate);
+    cores.addEventListener("change", calculate);
+
+    function setMode(nextMode) {
+      mode = nextMode;
+
+      modeA.classList.toggle("active", mode === "A");
+      modeKW.classList.toggle("active", mode === "kW");
+
+      valueLabel.textContent = mode === "A" ? "電流（A）" : "電力（kW）";
+      inputValue.placeholder = mode === "A" ? "例：18.7" : "例：6.5";
+
+      calculate();
+    }
+
+    function calculate() {
+      const raw = Number(inputValue.value);
+
+      if (!raw || raw <= 0) {
+        resultArea.className = "empty";
+        resultArea.innerHTML = "数値を入力してください";
+        return;
+      }
+
+      const selectedVoltage = voltage.value;
+      const selectedCable = cable.value;
+      const selectedCores = cores.value;
+
+      const table = allowableCurrent[selectedCable]?.[selectedCores];
+
+      if (!table) {
+        resultArea.className = "empty";
+        resultArea.innerHTML = "対応する許容電流表がありません";
+        return;
+      }
+
+      const currentA = mode === "A"
+        ? raw
+        : kwToAmp(raw, selectedVoltage);
+
+      const powerKW = mode === "kW"
+        ? raw
+        : ampToKw(raw, selectedVoltage);
+
+      const sizes = Object.keys(table).map(Number).sort((a, b) => a - b);
+
+      const minSize = sizes.find(size => table[size] >= currentA);
+
+      if (!minSize) {
+        resultArea.className = "empty";
+        resultArea.innerHTML = "対応範囲を超えています";
+        return;
+      }
+
+      const minIndex = sizes.indexOf(minSize);
+      const recommendedSize = sizes[minIndex + 1] || minSize;
+      const allowableA = table[recommendedSize];
+      const minAllowableA = table[minSize];
+
+      const usage = (currentA / allowableA) * 100;
+      const usageClass =
+        usage >= 90 ? "usage-danger" :
+        usage >= 70 ? "usage-warn" :
+        "usage-ok";
+
+      resultArea.className = "";
+      resultArea.innerHTML = `
+        <div class="result-main">
+          <div class="result-label">推奨サイズ</div>
+          <div class="result-size">${formatSize(recommendedSize)}<span>sq</span></div>
+          <div class="min-size">最小成立サイズ：${formatSize(minSize)} sq（許容 ${minAllowableA} A）</div>
+        </div>
+
+        <div class="details">
+          <div class="detail">
+            <div class="k">計算電流</div>
+            <div class="v">${currentA.toFixed(1)} A</div>
+          </div>
+          <div class="detail">
+            <div class="k">換算電力</div>
+            <div class="v">${powerKW.toFixed(2)} kW</div>
+          </div>
+          <div class="detail">
+            <div class="k">許容電流</div>
+            <div class="v">${allowableA} A</div>
+          </div>
+          <div class="detail">
+            <div class="k">使用率</div>
+            <div class="v ${usageClass}">${usage.toFixed(0)}%</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function kwToAmp(kw, v) {
+      if (v === "200") {
+        return (kw * 1000) / (Math.sqrt(3) * 200 * PF);
+      }
+
+      if (v === "100") {
+        return (kw * 1000) / (100 * PF);
+      }
+
+      if (v === "200single") {
+        return (kw * 1000) / (200 * PF);
+      }
+
+      return 0;
+    }
+
+    function ampToKw(a, v) {
+      if (v === "200") {
+        return (Math.sqrt(3) * 200 * a * PF) / 1000;
+      }
+
+      if (v === "100") {
+        return (100 * a * PF) / 1000;
+      }
+
+      if (v === "200single") {
+        return (200 * a * PF) / 1000;
+      }
+
+      return 0;
+    }
+
+    function formatSize(size) {
+      return Number.isInteger(size) ? String(size) : String(size);
+    }
+  </script>
+</body>
+</html>
